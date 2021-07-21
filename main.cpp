@@ -14,13 +14,14 @@ int main()
 		myBytes[i] = pow(2, i);
 	}
 	
-	WahlBit::BitsParser bits((void*)myBytes, 5, 1);
+	unsigned int bufferLength = 3;
+	WahlBit::BitsParser bits((void*)myBytes, 5, bufferLength);
 	//WahlBit::leftShiftBufferBytes((void*)myBytes, 5, 2);
 	//WahlBit::rightShiftBufferBits((void*)myBytes, 5, 4);
 
-	for (int i = 0; i < 8; ++i) {
-		void* ptr = bits.getBits(4);
-		unsigned char val = *((unsigned char*)ptr);
+	for (int i = 0; i < 5; ++i) {
+		void* ptr = bits.getBits(8);
+		unsigned char val = *((unsigned char*)ptr + bufferLength - 1);
 		//myBytes[i] = myBytes[i] >> 4;
 		//unsigned char val = myBytes[i];
 		cout << (unsigned short)val << " ";
