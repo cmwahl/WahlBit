@@ -13,7 +13,7 @@ namespace WahlBit {
 		~BitsParser();
 
 		// Get bits methods
-		void* getBits(int numberOfBits);
+		void* getBits(unsigned int numberOfBits);
 		void* getBuffer();
 		unsigned int getBufferLength();
 
@@ -27,11 +27,13 @@ namespace WahlBit {
 		// Returns true if found, false if reaches endOfBits
 		bool findBitString(unsigned long long int bitString, unsigned short numBits);
 
+		
+
 	private:
 
-		char* data = nullptr;
+		unsigned char* data = nullptr;
 		unsigned int dataLength = 0;
-		char* buffer = nullptr; // 8 Byte buffer
+		unsigned char* buffer = nullptr; // 8 Byte buffer
 		unsigned int bufferLength = 0;
 
 		unsigned int bytesLoc = 0;
@@ -39,8 +41,17 @@ namespace WahlBit {
 
 		unsigned long long int getBitsFromByte(void* bytes, unsigned short numOfBits);
 		void copyToBuffer();
+		void updateLocs(unsigned int numberOfBits);
 	};
 
+	void rightShiftBuffer(void* buffer, unsigned int const bufferLength, unsigned int const shift);
+	void rightShiftBufferBytes(void* buffer, unsigned int const bufferLength, unsigned int const shift);
+	void rightShiftBufferBits(void* buffer, unsigned int const bufferLength, unsigned int const shift);
+	void leftShiftBufferBytes(void* buffer, unsigned int const bufferLength, unsigned int const shift);
+	void leftShiftBufferBits(void* buffer, unsigned int const bufferLength, unsigned int const shift);
+
 }
+
+
 
 
