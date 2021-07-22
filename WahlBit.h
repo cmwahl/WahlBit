@@ -39,7 +39,6 @@ namespace WahlBit {
 		unsigned int bytesLoc = 0;
 		unsigned short bitsLoc = 0;
 
-		unsigned long long int getBitsFromByte(void* bytes, unsigned short numOfBits);
 		void copyToBuffer();
 		void updateLocs(unsigned int numberOfBits);
 	};

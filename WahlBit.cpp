@@ -21,17 +21,17 @@ namespace WahlBit {
 	void* BitsParser::getBits(unsigned int numberOfBits) {
 		copyToBuffer();
 
-		unsigned char cmon = *buffer;
+		//unsigned char cmon = *buffer;
 		//std::cout << "Buffer: " << (unsigned short)cmon << std::endl;
 
 		unsigned int shift = bufferLength * 8 - numberOfBits;
 		
 		//std::cout << "Start Buffer: " << (unsigned short)cmon << std::endl;
 		leftShiftBufferBits((void*)buffer, bufferLength, bitsLoc);
-		cmon = *buffer;
+		//cmon = *buffer;
 		//std::cout << "Left Buffer: " << (unsigned short)cmon << std::endl;
 		rightShiftBuffer((void*)buffer, bufferLength, shift);
-		cmon = *buffer;
+		//cmon = *buffer;
 		//std::cout << "Final Buffer: " << (unsigned short)cmon << std::endl << std::endl;
 
 		updateLocs(numberOfBits);
@@ -53,6 +53,36 @@ namespace WahlBit {
 		bitsLoc = (numberOfBits + bitsLoc) % 8;
 	}
 
+	void* BitsParser::getBuffer() {
+		return (void*)buffer;
+	}
+
+	unsigned int BitsParser::getBufferLength() {
+		return bufferLength;
+	}
+
+	unsigned int BitsParser::getByteLoc() {
+		return bytesLoc;
+	}
+
+	unsigned int BitsParser::getBitLoc() {
+		return bitsLoc;
+	}
+
+	void BitsParser::setByteLoc(unsigned int _bytesLoc) {
+		bytesLoc = _bytesLoc;
+	}
+
+	void BitsParser::setBitLoc(unsigned short _bitsLoc) {
+		bitsLoc = _bitsLoc;
+	}
+
+	bool BitsParser::findBitString(unsigned long long int bitString, unsigned short numBits) {
+
+		return false;
+	}
+
+
 	// UTILITIES
 	void rightShiftBuffer(void* buffer, unsigned int const bufferLength, unsigned int const shift) {
 		unsigned int byteShift = shift / 8;
@@ -66,7 +96,7 @@ namespace WahlBit {
 		unsigned char* ptr = (unsigned char*)buffer;
 		unsigned int byteShift = shift > bufferLength - 1 ? bufferLength - 1 : shift;
 		
-		for (int i = 0; i < bufferLength - byteShift; ++i) {
+		for(int i = 0; i < bufferLength - byteShift; ++i) {
 			ptr[bufferLength - i - 1] = ptr[bufferLength - i - 1 - byteShift];
 		}
 
@@ -79,7 +109,7 @@ namespace WahlBit {
 
 		unsigned int byte = 0;
 		unsigned char prevByteBits = 0;
-		for (unsigned int i = 1; i < bufferLength; ++i) {
+		for(unsigned int i = 1; i < bufferLength; ++i) {
 			//std::cout << "rightBitShift loop" << std::endl;
 			byte = bufferLength - i;
 			prevByteBits = 0;
@@ -98,7 +128,7 @@ namespace WahlBit {
 		unsigned char* ptr = (unsigned char*)buffer;
 		unsigned int byteShift = shift > bufferLength - 1 ? bufferLength - 1 : shift;
 
-		for (int i = 0; i < bufferLength - byteShift; ++i) {
+		for(int i = 0; i < bufferLength - byteShift; ++i) {
 			ptr[i] = ptr[i + byteShift];
 		}
 
@@ -111,7 +141,7 @@ namespace WahlBit {
 
 		unsigned int byte = 0;
 		unsigned char nextByteBits = 0;
-		for (unsigned int byte = 0; byte < bufferLength - 1; ++byte) {
+		for(unsigned int byte = 0; byte < bufferLength - 1; ++byte) {
 			//std::cout << "leftBitShift Loop" << std::endl;
 			nextByteBits = 0;
 
