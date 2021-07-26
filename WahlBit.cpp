@@ -170,7 +170,6 @@ namespace WahlBit {
 		unsigned int byte = 0;
 		unsigned char prevByteBits = 0;
 		for(unsigned int i = 1; i < bufferLength; ++i) {
-			//std::cout << "rightBitShift loop" << std::endl;
 			byte = bufferLength - i;
 			prevByteBits = 0;
 
@@ -179,9 +178,14 @@ namespace WahlBit {
 			prevByteBits = ptr[byte - 1] << (8 - bitShift);
 			ptr[byte] += prevByteBits;
 		}
-		//std::cout << "rightShift bitShift: " << bitShift << ", " << (unsigned short)ptr[0] << std::endl;
 		ptr[0] = ptr[0] >> bitShift;
-		//std::cout << "rightShift bitShift: " << bitShift << ", " << (unsigned short)ptr[0] << std::endl;
+	}
+
+	void leftShiftBuffer(void* buffer, unsigned int const bufferLength, unsigned int const shift) {
+		unsigned int byteShift = shift / 8;
+		unsigned int bitShift = shift % 8;
+		leftShiftBufferBytes(buffer, bufferLength, byteShift);
+		leftShiftBufferBits(buffer, bufferLength, bitShift);
 	}
 
 	void leftShiftBufferBytes(void* buffer, unsigned int const bufferLength, unsigned int const shift) {
@@ -202,7 +206,6 @@ namespace WahlBit {
 		unsigned int byte = 0;
 		unsigned char nextByteBits = 0;
 		for(unsigned int byte = 0; byte < bufferLength - 1; ++byte) {
-			//std::cout << "leftBitShift Loop" << std::endl;
 			nextByteBits = 0;
 
 			ptr[byte] = ptr[byte] << bitShift;
@@ -210,7 +213,6 @@ namespace WahlBit {
 			nextByteBits = ptr[byte + 1] >> (8 - bitShift);
 			ptr[byte] += nextByteBits;
 		}
-		//std::cout << "leftShift bitShift: " << bitShift << std::endl;
 		ptr[bufferLength - 1] = ptr[bufferLength - 1] << bitShift;
 	}
 

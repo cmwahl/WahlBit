@@ -46,6 +46,7 @@ namespace WahlBit {
 	void rightShiftBuffer(void* buffer, unsigned int const bufferLength, unsigned int const shift);
 	void rightShiftBufferBytes(void* buffer, unsigned int const bufferLength, unsigned int const shift);
 	void rightShiftBufferBits(void* buffer, unsigned int const bufferLength, unsigned int const shift);
+	void leftShiftBuffer(void* buffer, unsigned int const bufferLength, unsigned int const shift);
 	void leftShiftBufferBytes(void* buffer, unsigned int const bufferLength, unsigned int const shift);
 	void leftShiftBufferBits(void* buffer, unsigned int const bufferLength, unsigned int const shift);
 
