@@ -27,7 +27,8 @@ namespace WahlBit {
 		// Returns true if found, false if reaches endOfBits
 		bool findBitString(void* bitString, unsigned int bitStringLength, unsigned short numBits);
 
-		
+		// End of Bits
+		bool isEndOfBits();
 
 	private:
 		bool endOfBits = false;
@@ -39,7 +40,7 @@ namespace WahlBit {
 		unsigned int bytesLoc = 0;
 		unsigned short bitsLoc = 0;
 
-		void copyToBuffer();
+		bool copyToBuffer();
 		void updateLocs(unsigned int numberOfBits);
 	};
 

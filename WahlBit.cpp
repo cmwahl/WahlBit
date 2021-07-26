@@ -19,6 +19,10 @@ namespace WahlBit {
 	}
 
 	void* BitsParser::getBits(unsigned int numberOfBits) {
+		if (endOfBits) {
+			return nullptr;
+		}
+
 		copyToBuffer();
 
 		//unsigned char cmon = *buffer;
@@ -44,13 +48,20 @@ namespace WahlBit {
 		return (void*)buffer;
 	}
 
-	void BitsParser::copyToBuffer() {
+	bool BitsParser::copyToBuffer() {
+
+		if (endOfBits) {
+			return false;
+		}
+
 		memset(buffer, 0, bufferLength);
 
 		unsigned int bytesLeft = dataLength - bytesLoc;
 		unsigned int bytesToWrite = bytesLeft >= bufferLength ? bufferLength : bytesLeft;
 
 		memcpy(buffer, data + bytesLoc, bytesToWrite);
+
+		return true;
 	}
 
 	void BitsParser::updateLocs(unsigned int numberOfBits) {
@@ -85,6 +96,7 @@ namespace WahlBit {
 			return false;
 		}
 		bytesLoc = _bytesLoc;
+		endOfBits = false;
 		return true;
 	}
 
@@ -101,9 +113,15 @@ namespace WahlBit {
 		unsigned int startByte = getByteLoc();
 		unsigned int startBit = getBitLoc();
 
+		if (endOfBits) {
+			return false;
+		}
+
+		// If bad parameters
 		if (numBits / 8 > bitStringLength || numBits / 8 > bufferLength) {
 			return false;
 		}
+
 		// Get initial bits
 		getBits(numBits);
 
@@ -116,7 +134,7 @@ namespace WahlBit {
 			if (match) {
 				break;
 			}
-			// Get next bit
+			// Get next bit (did not use premade methods due to optimizing just grabbing 1 bit)
 			startBit += 1;
 			startByte += startBit / 8;
 			startBit = startBit % 8;
@@ -125,7 +143,7 @@ namespace WahlBit {
 				endOfBits = true;
 				return false;
 			}
-
+			
 			leftShiftBufferBits((void*)buffer, bufferLength, 1);
 
 			// Clear unwanted bit
@@ -140,6 +158,10 @@ namespace WahlBit {
 		setBitLoc(startBit);
 		setByteLoc(startByte);
 		return match;
+	}
+
+	bool BitsParser::isEndOfBits() {
+		return endOfBits;
 	}
 
 
