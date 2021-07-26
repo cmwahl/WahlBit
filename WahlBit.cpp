@@ -5,11 +5,13 @@
 
 namespace WahlBit {
 	
+	unsigned char bitVals[8] = { 128, 64, 32, 16, 8 , 4, 2, 1 };
+
 	// Class
-	BitsParser::BitsParser(void* _data, unsigned int _dataLength, unsigned int _bufferLength) {
+	BitsParser::BitsParser(void* _data, unsigned int _dataLength, unsigned int maxBitOperations) {
 		data = (unsigned char*)_data;
 		dataLength = _dataLength;
-		bufferLength = _bufferLength;
+		bufferLength = maxBitOperations / 8 + 1;
 		buffer = (unsigned char*)malloc(bufferLength);
 
 	}
@@ -23,10 +25,11 @@ namespace WahlBit {
 			return nullptr;
 		}
 
-		copyToBuffer();
+		if (numberOfBits / 8 >= bufferLength - 1) {
+			return false;
+		}
 
-		//unsigned char cmon = *buffer;
-		//std::cout << "Buffer: " << (unsigned short)cmon << std::endl;
+		copyToBuffer();
 
 		unsigned int shift = bufferLength * 8 - numberOfBits;
 
@@ -35,17 +38,68 @@ namespace WahlBit {
 			return nullptr;
 		}
 		
-		//std::cout << "Start Buffer: " << (unsigned short)cmon << std::endl;
 		leftShiftBufferBits((void*)buffer, bufferLength, bitsLoc);
-		//cmon = *buffer;
-		//std::cout << "Left Buffer: " << (unsigned short)cmon << std::endl;
 		rightShiftBuffer((void*)buffer, bufferLength, shift);
-		//cmon = *buffer;
-		//std::cout << "Final Buffer: " << (unsigned short)cmon << std::endl << std::endl;
 
 		updateLocs(numberOfBits);
 
 		return (void*)buffer;
+	}
+
+	bool BitsParser::putBits(void* bitString, unsigned int bitStringLength, unsigned int numBits) {
+		if (endOfBits) {
+			return false;
+		}
+
+		if (numBits / 8 >= bufferLength) {
+			return false;
+		}
+
+		// Reset and Fill buffer then set all unwanted bits to 0
+		memset(buffer, 0, bufferLength);
+		memcpy(buffer + (bufferLength - bitStringLength), bitString, bitStringLength);
+
+		unsigned int firstBufferIndex = bufferLength - (numBits / 8) - 1;
+		buffer[firstBufferIndex] = buffer[firstBufferIndex] << (8 - numBits % 8);
+		buffer[firstBufferIndex] = buffer[firstBufferIndex] >> (8 - numBits % 8);
+
+		// Line up
+		leftShiftBuffer(buffer, bufferLength, 8 - bitsLoc - (numBits % 8));
+
+		// First byte
+		unsigned int bitsLeft = numBits;
+		unsigned char replacer = 255;
+		unsigned int bitsInFirstByte = numBits > (8 - bitsLoc) ? (8 - bitsLoc) : numBits;
+		for (int i = bitsLoc; i < bitsLoc + bitsInFirstByte; ++i) {
+			replacer -= bitVals[i];
+		}
+
+		data[bytesLoc] = data[bytesLoc] & replacer;
+
+		data[bytesLoc] = data[bytesLoc] | buffer[firstBufferIndex];
+
+		bitsLeft -= bitsInFirstByte;
+
+		// Middle bytes
+		unsigned int lastByte = 0;
+		for (unsigned int i = 1; i <= (bitsLeft / 8); ++i) {
+			data[bytesLoc + i] = buffer[firstBufferIndex + i];
+			bitsLeft -= 8;
+			lastByte = bytesLoc + i + 1;
+		}
+
+		// Last byte
+		if (bitsLeft) {
+			replacer = 255;
+			for (int i = 0; i < bitsLeft; ++i) {
+				replacer -= bitVals[i];
+			}
+			data[lastByte] = data[lastByte] & replacer;
+			data[lastByte] = data[lastByte] | buffer[bufferLength - 1];
+		}
+
+		setByteLoc(lastByte + 1);
+		setBitLoc(bitsLeft);
 	}
 
 	bool BitsParser::copyToBuffer() {
@@ -264,5 +318,18 @@ namespace WahlBit {
 			}
 		}
 		return match;
+	}
+
+	void printBytes(void* _buffer, unsigned int bufferLength) {
+		char* buffer = (char*)_buffer;
+
+		for (int i = 0; i < bufferLength; ++i) {
+			unsigned char val = buffer[i];
+			std::cout << (unsigned short) val;
+			if (i != bufferLength - 1) {
+				std::cout << ", ";
+			}
+		}
+		std::cout << std::endl;
 	}
 }

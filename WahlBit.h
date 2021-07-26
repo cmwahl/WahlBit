@@ -17,6 +17,9 @@ namespace WahlBit {
 		void* getBuffer();
 		unsigned int getBufferLength();
 
+		// Put bits methods
+		bool putBits(void* bitString, unsigned int bitStringLength, unsigned int numBits);
+
 		// Parser Location Util
 		unsigned int getByteLoc();
 		unsigned int getBitLoc();
@@ -52,6 +55,8 @@ namespace WahlBit {
 	void leftShiftBufferBits(void* buffer, unsigned int const bufferLength, unsigned int const shift);
 
 	bool bitsCompare(void* _buffer, unsigned int bufferLength, void* _data, unsigned int dataLength, unsigned int bits);
+
+	void printBytes(void* _buffer, unsigned int bufferLength);
 }
 
 
