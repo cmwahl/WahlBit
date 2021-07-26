@@ -5,13 +5,14 @@
 
 namespace WahlBit {
 	
+	// Bit values
 	unsigned char bitVals[8] = { 128, 64, 32, 16, 8 , 4, 2, 1 };
 
-	// Class
-	BitsParser::BitsParser(void* _data, unsigned int _dataLength, unsigned int maxBitOperations) {
+	// CLASS
+	BitsParser::BitsParser(void* _data, unsigned int _dataLength, unsigned int maxNumBitOperations) {
 		data = (unsigned char*)_data;
 		dataLength = _dataLength;
-		bufferLength = maxBitOperations / 8 + 1;
+		bufferLength = maxNumBitOperations / 8 + 1;
 		buffer = (unsigned char*)malloc(bufferLength);
 
 	}
