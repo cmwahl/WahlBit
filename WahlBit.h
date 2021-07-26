@@ -20,17 +20,17 @@ namespace WahlBit {
 		// Parser Location Util
 		unsigned int getByteLoc();
 		unsigned int getBitLoc();
-		void setByteLoc(unsigned int _bytesLoc);
-		void setBitLoc(unsigned short _bitsLoc);
+		bool setByteLoc(unsigned int _bytesLoc);
+		bool setBitLoc(unsigned short _bitsLoc);
 
 		// Searches for the bitString from its given position and sets parser position to the bitString
 		// Returns true if found, false if reaches endOfBits
-		bool findBitString(unsigned long long int bitString, unsigned short numBits);
+		bool findBitString(void* bitString, unsigned int bitStringLength, unsigned short numBits);
 
 		
 
 	private:
-
+		bool endOfBits = false;
 		unsigned char* data = nullptr;
 		unsigned int dataLength = 0;
 		unsigned char* buffer = nullptr; // 8 Byte buffer
@@ -49,6 +49,7 @@ namespace WahlBit {
 	void leftShiftBufferBytes(void* buffer, unsigned int const bufferLength, unsigned int const shift);
 	void leftShiftBufferBits(void* buffer, unsigned int const bufferLength, unsigned int const shift);
 
+	bool bitsCompare(void* _buffer, unsigned int bufferLength, void* _data, unsigned int dataLength, unsigned int bits);
 }
 
 

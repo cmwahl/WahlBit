@@ -25,6 +25,11 @@ namespace WahlBit {
 		//std::cout << "Buffer: " << (unsigned short)cmon << std::endl;
 
 		unsigned int shift = bufferLength * 8 - numberOfBits;
+
+		if (bytesLoc + (bitsLoc + numberOfBits) / 8 >= dataLength) {
+			endOfBits = true;
+			return nullptr;
+		}
 		
 		//std::cout << "Start Buffer: " << (unsigned short)cmon << std::endl;
 		leftShiftBufferBits((void*)buffer, bufferLength, bitsLoc);
@@ -49,6 +54,12 @@ namespace WahlBit {
 	}
 
 	void BitsParser::updateLocs(unsigned int numberOfBits) {
+
+		if (bytesLoc + (bitsLoc + numberOfBits) / 8 >= dataLength) {
+			endOfBits = true;
+			return;
+		}
+
 		bytesLoc += (numberOfBits + bitsLoc) / 8;
 		bitsLoc = (numberOfBits + bitsLoc) % 8;
 	}
@@ -69,17 +80,66 @@ namespace WahlBit {
 		return bitsLoc;
 	}
 
-	void BitsParser::setByteLoc(unsigned int _bytesLoc) {
+	bool BitsParser::setByteLoc(unsigned int _bytesLoc) {
+		if (_bytesLoc >= dataLength) {
+			return false;
+		}
 		bytesLoc = _bytesLoc;
+		return true;
 	}
 
-	void BitsParser::setBitLoc(unsigned short _bitsLoc) {
+	bool BitsParser::setBitLoc(unsigned short _bitsLoc) {
+		if (_bitsLoc > 8) {
+			return false;
+		}
 		bitsLoc = _bitsLoc;
+		return true;
 	}
 
-	bool BitsParser::findBitString(unsigned long long int bitString, unsigned short numBits) {
+	bool BitsParser::findBitString(void* _bitString, unsigned int bitStringLength, unsigned short numBits) {
+		char* bitString = (char*)_bitString;
+		unsigned int startByte = getByteLoc();
+		unsigned int startBit = getBitLoc();
 
-		return false;
+		if (numBits / 8 > bitStringLength || numBits / 8 > bufferLength) {
+			return false;
+		}
+		// Get initial bits
+		getBits(numBits);
+
+		// Loop
+		bool match = false;
+		while (!match) {
+			// Compare
+			match = bitsCompare((void*)bitString, bitStringLength, (void*)buffer, bufferLength, numBits);
+
+			if (match) {
+				break;
+			}
+			// Get next bit
+			startBit += 1;
+			startByte += startBit / 8;
+			startBit = startBit % 8;
+
+			if (startByte == dataLength) {
+				endOfBits = true;
+				return false;
+			}
+
+			leftShiftBufferBits((void*)buffer, bufferLength, 1);
+
+			// Clear unwanted bit
+			buffer[bufferLength - numBits / 8 - 1] = buffer[bufferLength - (numBits / 8) - 1] << (8 - numBits);
+			buffer[bufferLength - numBits / 8 - 1] = buffer[bufferLength - (numBits / 8) - 1] >> (8 - numBits);
+
+			unsigned char addTo = (data[startByte + (startBit + numBits - 1) / 8] << (startBit + numBits - 1)%8); //This is wrong, don't need startBit, need the numBits away from startBit. Start a leastSig bit/byte
+			addTo = addTo >> 7;
+			buffer[bufferLength - 1] += addTo;
+		}
+
+		setBitLoc(startBit);
+		setByteLoc(startByte);
+		return match;
 	}
 
 
@@ -152,5 +212,33 @@ namespace WahlBit {
 		}
 		//std::cout << "leftShift bitShift: " << bitShift << std::endl;
 		ptr[bufferLength - 1] = ptr[bufferLength - 1] << bitShift;
+	}
+
+	bool bitsCompare(void* _buffer, unsigned int bufferLength, void* _data, unsigned int dataLength, unsigned int bits) {
+		char* buffer = (char*)_buffer;
+		char* data = (char*)_data;
+		bool match = true;
+
+		unsigned char read = data[dataLength - 1];
+
+		if (bits / 8 > bufferLength || bits / 8 > dataLength) {
+			return false;
+		}
+		for (int i = 0; i < bits / 8 + 1; ++i) {
+			unsigned char testBuffer = buffer[bufferLength - i - 1];
+			unsigned char testData = data[dataLength - i - 1];
+			if (i == bits / 8) {
+				testBuffer = testBuffer << 8 - bits;
+				testBuffer = testBuffer >> 8 - bits;
+
+				testData = testData << 8 - bits;
+				testData = testData >> 8 - bits;
+			}
+			if (testBuffer != testData) {
+				match = false;
+				break;
+			}
+		}
+		return match;
 	}
 }
