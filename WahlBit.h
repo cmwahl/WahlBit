@@ -9,8 +9,10 @@ namespace WahlBit {
 
 	class BitsParser {
 	public:
+		BitsParser();
 		BitsParser(void* _data, unsigned int _dataLength, unsigned int _bufferLength);
 		~BitsParser();
+		void newData(void* _data, unsigned int _dataLength, unsigned int _bufferLength);
 
 		// Get bits methods
 		void* getBits(unsigned int numberOfBits);

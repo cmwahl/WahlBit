@@ -9,6 +9,10 @@ namespace WahlBit {
 	unsigned char bitVals[8] = { 128, 64, 32, 16, 8 , 4, 2, 1 };
 
 	// CLASS
+	BitsParser::BitsParser(){
+		
+	}
+	
 	BitsParser::BitsParser(void* _data, unsigned int _dataLength, unsigned int maxNumBitsPerOperations) {
 		data = (unsigned char*)_data;
 		dataLength = _dataLength;
@@ -19,6 +23,16 @@ namespace WahlBit {
 
 	BitsParser::~BitsParser() {
 		free(buffer);
+	}
+	
+	void BitsParser::newData(void* _data, unsigned int _dataLength, unsigned int maxNumBitsPerOperations){
+		
+		data = (unsigned char*)_data;
+		dataLength = _dataLength;
+		free(buffer);
+		bufferLength = maxNumBitsPerOperations / 8 + 1;
+		buffer = (unsigned char*)malloc(bufferLength);
+		
 	}
 
 	void* BitsParser::getBits(unsigned int numberOfBits) {
