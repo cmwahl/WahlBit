@@ -50,13 +50,14 @@ namespace WahlBit {
 	};
 
 	void rightShiftBuffer(void* buffer, unsigned int const bufferLength, unsigned int const shift);
-	void rightShiftBufferBytes(void* buffer, unsigned int const bufferLength, unsigned int const shift);
-	void rightShiftBufferBits(void* buffer, unsigned int const bufferLength, unsigned int const shift);
+	void __rightShiftBufferBytes(void* buffer, unsigned int const bufferLength, unsigned int const shift);
+	void __rightShiftBufferBits(void* buffer, unsigned int const bufferLength, unsigned int const shift);
 	void leftShiftBuffer(void* buffer, unsigned int const bufferLength, unsigned int const shift);
-	void leftShiftBufferBytes(void* buffer, unsigned int const bufferLength, unsigned int const shift);
-	void leftShiftBufferBits(void* buffer, unsigned int const bufferLength, unsigned int const shift);
+	void __leftShiftBufferBytes(void* buffer, unsigned int const bufferLength, unsigned int const shift);
+	void __leftShiftBufferBits(void* buffer, unsigned int const bufferLength, unsigned int const shift);
 
 	bool bitsCompare(void* _buffer, unsigned int bufferLength, void* _data, unsigned int dataLength, unsigned int bits);
+	unsigned char getMostSigBit(unsigned char byte);
 
 	void printBytes(void* _buffer, unsigned int bufferLength);
 }

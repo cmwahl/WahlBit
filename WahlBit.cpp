@@ -9,10 +9,10 @@ namespace WahlBit {
 	unsigned char bitVals[8] = { 128, 64, 32, 16, 8 , 4, 2, 1 };
 
 	// CLASS
-	BitsParser::BitsParser(){
-		
+	BitsParser::BitsParser() {
+
 	}
-	
+
 	BitsParser::BitsParser(void* _data, unsigned int _dataLength, unsigned int maxNumBitsPerOperations) {
 		data = (unsigned char*)_data;
 		dataLength = _dataLength;
@@ -29,9 +29,16 @@ namespace WahlBit {
 		
 		data = (unsigned char*)_data;
 		dataLength = _dataLength;
-		free(buffer);
-		bufferLength = maxNumBitsPerOperations / 8 + 1;
-		buffer = (unsigned char*)malloc(bufferLength);
+		
+		if (bufferLength <= maxNumBitsPerOperations / 8 + 1) {
+			bufferLength = maxNumBitsPerOperations / 8 + 1;
+			free(buffer);
+			buffer = (unsigned char*)malloc(bufferLength);
+		}
+
+		setBitLoc(0);
+		setByteLoc(0);
+			
 		
 	}
 
@@ -53,7 +60,7 @@ namespace WahlBit {
 			return nullptr;
 		}
 		
-		leftShiftBufferBits((void*)buffer, bufferLength, bitsLoc);
+		__leftShiftBufferBits((void*)buffer, bufferLength, bitsLoc);
 		rightShiftBuffer((void*)buffer, bufferLength, shift);
 
 		updateLocs(numberOfBits);
@@ -213,7 +220,7 @@ namespace WahlBit {
 				return false;
 			}
 			
-			leftShiftBufferBits((void*)buffer, bufferLength, 1);
+			__leftShiftBufferBits((void*)buffer, bufferLength, 1);
 
 			// Clear unwanted bit
 			buffer[bufferLength - numBits / 8 - 1] = buffer[bufferLength - (numBits / 8) - 1] << (8 - numBits);
@@ -239,11 +246,11 @@ namespace WahlBit {
 		unsigned int byteShift = shift / 8;
 		unsigned int bitShift = shift % 8;
 		//std::cout << "byteShift: " << byteShift << ", bitShift: " << bitShift << std::endl;
-		rightShiftBufferBytes(buffer, bufferLength, byteShift);
-		rightShiftBufferBits(buffer, bufferLength, bitShift);
+		__rightShiftBufferBytes(buffer, bufferLength, byteShift);
+		__rightShiftBufferBits(buffer, bufferLength, bitShift);
 	}
 
-	void rightShiftBufferBytes(void* buffer, unsigned int const bufferLength, unsigned int const shift) {
+	void __rightShiftBufferBytes(void* buffer, unsigned int const bufferLength, unsigned int const shift) {
 		unsigned char* ptr = (unsigned char*)buffer;
 		unsigned int byteShift = shift > bufferLength - 1 ? bufferLength - 1 : shift;
 		
@@ -254,7 +261,7 @@ namespace WahlBit {
 		memset(ptr, 0, byteShift);
 	}
 
-	void rightShiftBufferBits(void* buffer, unsigned int const bufferLength, unsigned int const shift) {
+	void __rightShiftBufferBits(void* buffer, unsigned int const bufferLength, unsigned int const shift) {
 		unsigned char* ptr = (unsigned char*)buffer;
 		unsigned int bitShift = shift > 8 ? 8 : shift;
 
@@ -275,11 +282,11 @@ namespace WahlBit {
 	void leftShiftBuffer(void* buffer, unsigned int const bufferLength, unsigned int const shift) {
 		unsigned int byteShift = shift / 8;
 		unsigned int bitShift = shift % 8;
-		leftShiftBufferBytes(buffer, bufferLength, byteShift);
-		leftShiftBufferBits(buffer, bufferLength, bitShift);
+		__leftShiftBufferBytes(buffer, bufferLength, byteShift);
+		__leftShiftBufferBits(buffer, bufferLength, bitShift);
 	}
 
-	void leftShiftBufferBytes(void* buffer, unsigned int const bufferLength, unsigned int const shift) {
+	void __leftShiftBufferBytes(void* buffer, unsigned int const bufferLength, unsigned int const shift) {
 		unsigned char* ptr = (unsigned char*)buffer;
 		unsigned int byteShift = shift > bufferLength - 1 ? bufferLength - 1 : shift;
 
@@ -290,7 +297,7 @@ namespace WahlBit {
 		memset(ptr + bufferLength - byteShift, 0, byteShift);
 	}
 
-	void leftShiftBufferBits(void* buffer, unsigned int const bufferLength, unsigned int const shift) {
+	void __leftShiftBufferBits(void* buffer, unsigned int const bufferLength, unsigned int const shift) {
 		unsigned char* ptr = (unsigned char*)buffer;
 		unsigned int bitShift = shift > 8 ? 8 : shift;
 
@@ -333,6 +340,14 @@ namespace WahlBit {
 			}
 		}
 		return match;
+	}
+
+	unsigned char getMostSigBit(unsigned char byte) {
+		unsigned char compare = 128;
+		while (compare > byte) {
+			compare = compare >> 1;
+		}
+		return compare;
 	}
 
 	void printBytes(void* _buffer, unsigned int bufferLength) {
